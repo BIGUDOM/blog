@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bigudom Blog</title>
 
   <!-- Font Awesome -->
@@ -12,12 +12,6 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Mobile Right Sidebar Button -->
-<!-- <div class="mobile-right-btn" id="mobileRightBtn">
-  <i class="fas fa-ellipsis-h"></i>
-</div> -->
-
-
   <!-- Navigation -->
   <nav>
     <div class="nav-left">
@@ -33,7 +27,8 @@
     <div class="nav-right">
       <div class="search">
         <i class="fas fa-search"></i>
-        <input type="text" placeholder="Search...">
+        <!-- ADDED id="searchInput" so JS can find it (visual unchanged) -->
+        <input id="searchInput" type="text" placeholder="Search...">
       </div>
       <i class="fas fa-cog"></i>
       <i class="fas fa-th"></i>
@@ -52,7 +47,8 @@
             <p>John Nicholson</p>
             <a href="#">See your profile</a>
           </div>
-        </div> 
+        </div>
+
         <hr>
         <div class="user-profile">
           <i class="fa-solid fa-message"></i>
@@ -61,6 +57,7 @@
             <a href="#">Help us improve the design</a>
           </div>
         </div>
+
         <hr>
         <div class="settings-link">
           <i class="fa-solid fa-sliders settings-icon"></i>
@@ -111,6 +108,7 @@
       <!-- Post Form -->
       <section class="add-post">
         <h2>Add a New Post</h2>
+        <!-- kept id "post-form" exactly -->
         <form id="post-form">
           <input type="text" id="User_name" placeholder="Your Name" required>
           <input type="text" id="post-title" placeholder="Post Title" required>
@@ -133,6 +131,7 @@
         </form>
       </section>
 
+      <!-- posts result section (kept id 'posts' as original) -->
       <section id="posts"></section>
 
       <!-- Clear All Posts Button -->
@@ -191,6 +190,6 @@
   </footer>
 
   <!-- JavaScript -->
-  <script src="index.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
