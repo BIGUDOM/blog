@@ -290,17 +290,28 @@ main {
 }
 
 /* Preview */
-#preview-container {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 10px;
-}
+
 .preview-item {
   max-width: 100px;
   max-height: 100px;
   border-radius: 4px;
 }
+#previewContainer {
+  width: 100%;
+  text-align: center;
+  overflow-x: hidden;
+}
+
+.preview {
+  display: block;
+  max-width: 90%;       /* scale down more aggressively */
+  width: auto;          /* keep natural width until max-width */
+  max-height: 60vh;     /* cap height to 60% of viewport height */
+  height: auto;         /* maintain aspect ratio */
+  margin: 10px auto;
+  object-fit: contain;  /* ensures video/image scales inside box */
+}
+
 
 /* =============================
    POSTS
@@ -745,3 +756,4 @@ body.dark-theme .right-sidebar {
     display: block;
   }
 }
+
