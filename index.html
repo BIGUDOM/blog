@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bigudom Blog</title>
 
   <!-- Font Awesome -->
@@ -10,186 +10,244 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="login.css">
 </head>
 <body>
-  <!-- Navigation -->
-  <nav>
-    <div class="nav-left">
-      <h1><span>B</span>IGUDOM BLOG</h1>
-      <ul>
-        <li><i class="fas fa-bell"></i></li>
-        <li><i class="fas fa-inbox"></i></li>
-        <li><i class="fas fa-video"></i></li>
-        <li><i class="fas fa-th"></i></li>
-        <li><i class="fas fa-user-circle"></i></li>
-      </ul>
-    </div>
-    <div class="nav-right">
-      <div class="search">
-        <i class="fas fa-search"></i>
-        <!-- ADDED id="searchInput" so JS can find it (visual unchanged) -->
-        <input id="searchInput" type="text" placeholder="Search...">
-      </div>
-      <i class="fas fa-cog"></i>
-      <i class="fas fa-th"></i>
-      <div class="nav-user-icon online" onclick="settingsMenuToggle()">
-        <i class="fas fa-user-circle"></i>
-      </div>
-    </div>
-
-    <!-- settings-menu -->
-    <div class="settings-menu">
-      <div id="dark-btn"><span></span></div>
-      <div class="settings-menu-inner">
-        <div class="user-profile">
-          <i class="fas fa-user-circle"></i>
-          <div>
-            <p>John Nicholson</p>
-            <a href="#">See your profile</a>
+  <!-- AUTH POPUP / CONTAINER -->
+  <div id="loginContainer" class="auth-overlay" style="display:flex;">
+    <div class="auth-container">
+      <!-- Sign In -->
+      <div class="wrapper" id="Signin">
+        <form id="loginForm" class="auth-form">
+          <h1>Sign In</h1>
+          <div class="input-box">
+            <i class="fa fa-user"></i>
+            <input type="text" id="loginUsername" placeholder="Username" required>
           </div>
-        </div>
-
-        <hr>
-        <div class="user-profile">
-          <i class="fa-solid fa-message"></i>
-          <div>
-            <p>Give Feedback</p>
-            <a href="#">Help us improve the design</a>
+          <div class="input-box">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="loginPassword" placeholder="Password" required>
           </div>
-        </div>
-
-        <hr>
-        <div class="settings-link">
-          <i class="fa-solid fa-sliders settings-icon"></i>
-          <a href="#">Settings & Privacy <i class="fa-solid fa-angle-right"></i></a>
-        </div>
-        <div class="settings-link">
-          <i class="fa-solid fa-circle-info settings-icon"></i>
-          <a href="#">Help & Support <i class="fa-solid fa-angle-right"></i></a>
-        </div>
-        <div class="settings-link">
-          <i class="fa-solid fa-display settings-icon"></i>
-          <a href="#">Display & Accessibility <i class="fa-solid fa-angle-right"></i></a>
-        </div>
-        <div class="settings-link">
-          <i class="fa-solid fa-right-from-bracket settings-icon"></i>
-          <a href="#">Logout <i class="fa-solid fa-angle-right"></i></a>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!-- Main -->
-  <main>
-    <!-- Left Sidebar -->
-    <div class="left-sidebar">
-      <ul>
-        <li><i class="fas fa-home"></i> Home</li>
-        <li><i class="fas fa-fire"></i> Trending</li>
-        <li><i class="fas fa-subscript"></i> Subscriptions</li>
-        <hr>
-        <li><i class="fas fa-book"></i> Library</li>
-        <li><i class="fas fa-history"></i> History</li>
-        <hr>
-        <li><i class="fas fa-film"></i> Movies</li>
-        <li><i class="fas fa-gamepad"></i> Gaming</li>
-        <li><i class="fas fa-newspaper"></i> News</li>
-        <li><i class="fas fa-futbol"></i> Sports</li>
-        <hr>
-        <li><i class="fas fa-cog"></i> Settings</li>
-        <li><i class="fas fa-flag"></i> Report History</li>
-        <li><i class="fas fa-question-circle"></i> Help</li>
-        <li><i class="fas fa-comment-alt"></i> Send Feedback</li>
-      </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Post Form -->
-      <section class="add-post">
-        <h2>Add a New Post</h2>
-        <!-- kept id "post-form" exactly -->
-        <form id="post-form">
-          <input type="text" id="User_name" placeholder="Your Name" required>
-          <input type="text" id="post-title" placeholder="Post Title" required>
-          <textarea id="post-content" placeholder="Post Content" required></textarea>
-
-          <!-- Hidden file inputs -->
-          <input type="file" id="fileInputImage" accept="image/*" style="display:none" multiple>
-          <input type="file" id="fileInputVideo" accept="video/*" style="display:none" multiple>
-
-          <!-- Upload buttons -->
-          <div>
-            <button type="button" id="uploadImageButton"><i class="fas fa-image"></i> Upload Image</button>
-            <button type="button" id="uploadVideoButton"><i class="fas fa-video"></i> Upload Video</button>
+          <div class="remember-forget">
+            <label><input type="checkbox"> Remember me</label>
+            <a href="#">Forgot password?</a>
           </div>
-
-          <!-- Preview -->
-          <div id="preview-container"></div>
-
-          <button type="submit">Add Post</button>
+          <button type="submit" class="btn">Login</button>
+          <div class="register-link">
+            <p>Don’t have an account? <a href="#" id="goToSignup">Sign up</a></p>
+          </div>
         </form>
-      </section>
+      </div>
 
-      <!-- posts result section (kept id 'posts' as original) -->
-      <section id="posts"></section>
-
-      <!-- Clear All Posts Button -->
-      <div class="clear-posts">
-        <button id="clearPostsButton">Clear All Posts</button>
+      <!-- Sign Up -->
+      <div class="wrapper" id="Signup" style="display:none;">
+        <form id="signupForm" class="auth-form">
+          <h1>Sign Up</h1>
+          <div class="input-box">
+            <i class="fa fa-user"></i>
+            <input type="text" id="signupUsername" placeholder="Username" required>
+          </div>
+          <div class="input-box">
+            <i class="fa fa-signature"></i>
+            <input type="text" id="signupName" placeholder="Full name" required>
+          </div>
+          <div class="input-box">
+            <i class="fa fa-envelope"></i>
+            <input type="email" id="signupEmail" placeholder="Email" required>
+          </div>
+          <div class="input-box">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="signupPassword" placeholder="Password" required>
+          </div>
+           <div class="input-box">
+            <i class="fa fa-lock"></i>
+            <input type="password" id="ConfirmsignupPassword" placeholder="Confrim-Password" required>
+          </div>
+          <button type="submit" class="btn">Register</button>
+          <div class="register-link">
+            <p>Already have an account? <a href="#" id="goToSignin">Sign in</a></p>
+          </div>
+          <div class="theme-toggle">
+            <button id="toggleTheme">🌙 Dark Mode</button>
+          </div>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- Right Sidebar -->
-    <div class="right-sidebar">
-      <div class="event">
-        <h2>Upcoming Events</h2>
+  <!-- MAIN APP (hidden until logged in) -->
+  <div id="blogContainer" style="display:none;">
+    <!-- Navigation -->
+    <nav>
+      <div class="nav-left">
+        <h1><span>B</span>IGUDOM BLOG</h1>
         <ul>
-          <li>
-            <h3>Web Development Workshop</h3>
-            <p>Date: July 15, 2023</p>
-            <p>Location: Online</p>
-          </li>
-          <li>
-            <h3>JavaScript Conference</h3>
-            <p>Date: August 20, 2023</p>
-            <p>Location: New York, NY</p>
-          </li>
-          <li>
-            <h3>CSS Masterclass</h3>
-            <p>Date: September 10, 2023</p>
-            <p>Location: San Francisco, CA</p>
-          </li>
+          <li><i class="fas fa-bell"></i></li>
+          <li><i class="fas fa-inbox"></i></li>
+          <li><i class="fas fa-video"></i></li>
+          <li><i class="fas fa-th"></i></li>
+          <li><i class="fas fa-user-circle"></i></li>
         </ul>
       </div>
-      <div class="advertisement">
-        <h2>Advertisement</h2>
-        <img src="https://via.placeholder.com/250x150" alt="Ad">
-        <p>Visit <a href="#">www.sponsor.com</a> for more info.</p>
-      </div>
-      <div class="about">
-        <h2>About</h2>
-        <p>This is a blog platform where you can share your thoughts and ideas.</p>
-        <h2>Contact</h2>
-        <p>Email: contact@myblog.com</p>
-        <p>Phone: +123 456 7890</p>
-        <h2>Follow Us</h2>
-        <p>
-          <i class="fab fa-facebook"></i>
-          <i class="fab fa-twitter"></i>
-          <i class="fab fa-instagram"></i>
-          <i class="fab fa-linkedin"></i>
-        </p>
-      </div>
-    </div>
-  </main>
 
-  <!-- Footer -->
-  <footer>
-    <p>&copy; 2023 Bigudom Blog. All rights reserved.</p>
-  </footer>
+      <div class="nav-right">
+        <div class="search">
+          <i class="fas fa-search"></i>
+          <input id="searchInput" type="text" placeholder="Search...">
+        </div>
+        <i class="fas fa-cog"></i>
+        <i class="fas fa-th"></i>
+        <div class="nav-user-icon online" onclick="settingsMenuToggle()">
+          <i class="fas fa-user-circle"></i>
+        </div>
+      </div>
 
-  <!-- JavaScript -->
+      <div class="settings-menu">
+        <div id="dark-btn"><span></span></div>
+        <div class="settings-menu-inner">
+          <div class="user-profile">
+            <i class="fas fa-user-circle"></i>
+            <div>
+              <p id="settingsUsername">User</p>
+              <a href="#">See your profile</a>
+            </div>
+          </div>
+          <hr>
+          <div class="user-profile">
+            <i class="fa-solid fa-message"></i>
+            <div>
+              <p>Give Feedback</p>
+              <a href="#">Help us improve the design</a>
+            </div>
+          </div>
+          <hr>
+          <div class="settings-link">
+            <i class="fa-solid fa-sliders settings-icon"></i>
+            <a href="#">Settings & Privacy <i class="fa-solid fa-angle-right"></i></a>
+          </div>
+          <div class="settings-link">
+            <i class="fa-solid fa-circle-info settings-icon"></i>
+            <a href="#">Help & Support <i class="fa-solid fa-angle-right"></i></a>
+          </div>
+          <div class="settings-link">
+            <i class="fa-solid fa-display settings-icon"></i>
+            <a href="#">Display & Accessibility <i class="fa-solid fa-angle-right"></i></a>
+          </div>
+          <div class="settings-link">
+            <i class="fa-solid fa-right-from-bracket settings-icon"></i>
+            <a href="#" id="logoutBtnLink">Logout <i class="fa-solid fa-angle-right"></i></a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main -->
+    <main>
+      <!-- Left Sidebar -->
+      <div class="left-sidebar">
+        <ul>
+          <li><i class="fas fa-home"></i> Home</li>
+          <li><i class="fas fa-fire"></i> Trending</li>
+          <li><i class="fas fa-subscript"></i> Subscriptions</li>
+          <hr>
+          <li><i class="fas fa-book"></i> Library</li>
+          <li><i class="fas fa-history"></i> History</li>
+          <hr>
+          <li><i class="fas fa-film"></i> Movies</li>
+          <li><i class="fas fa-gamepad"></i> Gaming</li>
+          <li><i class="fas fa-newspaper"></i> News</li>
+          <li><i class="fas fa-futbol"></i> Sports</li>
+          <hr>
+          <li><i class="fas fa-cog"></i> Settings</li>
+          <li><i class="fas fa-flag"></i> Report History</li>
+          <li><i class="fas fa-question-circle"></i> Help</li>
+          <li><i class="fas fa-comment-alt"></i> Send Feedback</li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Post Form -->
+        <section class="add-post">
+          <h2>Add a New Post</h2>
+          <form id="post-form">
+            <input type="text" id="User_name" placeholder="Your Name" required>
+            <input type="text" id="post-title" placeholder="Post Title" required>
+            <textarea id="post-content" placeholder="Post Content" required></textarea>
+
+            <input type="file" id="fileInputImage" accept="image/*" style="display:none" multiple>
+            <input type="file" id="fileInputVideo" accept="video/*" style="display:none" multiple>
+
+            <div>
+              <button type="button" id="uploadImageButton"><i class="fas fa-image"></i> Upload Image</button>
+              <button type="button" id="uploadVideoButton"><i class="fas fa-video"></i> Upload Video</button>
+            </div>
+
+            <div id="preview-container"></div>
+
+            <button type="submit">Add Post</button>
+          </form>
+        </section>
+
+        <!-- posts -->
+        <section id="posts"></section>
+
+        <!-- Clear All Posts Button -->
+        <div class="clear-posts">
+          <button id="clearPostsButton">Clear All Posts</button>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="right-sidebar">
+        <div class="event">
+          <h2>Upcoming Events</h2>
+          <ul>
+            <li>
+              <h3>Web Development Workshop</h3>
+              <p>Date: July 15, 2023</p>
+              <p>Location: Online</p>
+            </li>
+            <li>
+              <h3>JavaScript Conference</h3>
+              <p>Date: August 20, 2023</p>
+              <p>Location: New York, NY</p>
+            </li>
+            <li>
+              <h3>CSS Masterclass</h3>
+              <p>Date: September 10, 2023</p>
+              <p>Location: San Francisco, CA</p>
+            </li>
+          </ul>
+        </div>
+        <div class="advertisement">
+          <h2>Advertisement</h2>
+          <img src="https://via.placeholder.com/250x150" alt="Ad">
+          <p>Visit <a href="#">www.sponsor.com</a> for more info.</p>
+        </div>
+        <div class="about">
+          <h2>About</h2>
+          <p>This is a blog platform where you can share your thoughts and ideas.</p>
+          <h2>Contact</h2>
+          <p>Email: contact@myblog.com</p>
+          <p>Phone: +123 456 7890</p>
+          <h2>Follow Us</h2>
+          <p>
+            <i class="fab fa-facebook"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin"></i>
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2023 Bigudom Blog. All rights reserved.</p>
+    </footer>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>

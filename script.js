@@ -1,319 +1,321 @@
-// Client-side script (works with the Flask backend)
-// Make sure your Flask server runs at http://127.0.0.1:5000
-const API_URL = "http://127.0.0.1:5000/posts";
-
+// -------------------- DOM ELEMENTS --------------------
 const postsContainer = document.getElementById("posts");
 const postForm = document.getElementById("post-form");
 const searchInput = document.getElementById("searchInput");
+const clearPostsButton = document.getElementById("clearPostsButton");
+const settingsMenu = document.querySelector(".settings-menu");
+const darkBtn = document.getElementById("dark-btn");
+const settingsUsername = document.getElementById("settingsUsername");
+
+// Auth
+const loginContainer = document.getElementById("loginContainer");
+const blogContainer = document.getElementById("blogContainer");
+const signupForm = document.getElementById("signupForm");
+const loginForm = document.getElementById("loginForm");
+const goToSignup = document.getElementById("goToSignup");
+const goToSignin = document.getElementById("goToSignin");
+const logoutBtnLink = document.getElementById("logoutBtnLink");
+
+// Upload
 const fileInputImage = document.getElementById("fileInputImage");
 const fileInputVideo = document.getElementById("fileInputVideo");
-const previewContainer = document.getElementById("preview-container");
 const uploadImageButton = document.getElementById("uploadImageButton");
 const uploadVideoButton = document.getElementById("uploadVideoButton");
-const clearPostsButton = document.getElementById("clearPostsButton");
-const darkBtn = document.getElementById("dark-btn");
+const previewContainer = document.getElementById("preview-container");
 
-let posts = [];
-
-// Wire upload buttons to hidden inputs
-uploadImageButton.addEventListener("click", () => fileInputImage.click());
-uploadVideoButton.addEventListener("click", () => fileInputVideo.click());
-
-// Preview selected files (supports multiple; shows all)
-function handleFilePreview(files, type) {
-  Array.from(files).forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const element = type === "image"
-        ? `<img src="${e.target.result}" alt="preview" class="preview-item">`
-        : `<video src="${e.target.result}" controls class="preview-item"></video>`;
-      previewContainer.insertAdjacentHTML("beforeend", element);
-    };
-    reader.readAsDataURL(file);
-  });
+// -------------------- LOCAL STORAGE UTILITIES --------------------
+function getPosts() {
+  return JSON.parse(localStorage.getItem("posts") || "[]");
+}
+function savePosts(posts) {
+  localStorage.setItem("posts", JSON.stringify(posts));
+}
+function loadUsers() {
+  return JSON.parse(localStorage.getItem("users") || "{}");
+}
+function saveUsers(users) {
+  localStorage.setItem("users", JSON.stringify(users));
+}
+function currentUser() {
+  return JSON.parse(localStorage.getItem("user"));
 }
 
-// reset preview when selecting new files
-fileInputImage.addEventListener("change", () => {
-  previewContainer.innerHTML = "";
-  handleFilePreview(fileInputImage.files, "image");
-});
-fileInputVideo.addEventListener("change", () => {
-  previewContainer.innerHTML = "";
-  handleFilePreview(fileInputVideo.files, "video");
-});
+// -------------------- SHOW/HIDE --------------------
+function showLoginPopup() {
+  loginContainer.style.display = "flex";
+  blogContainer.style.display = "none";
+}
+function showBlog() {
+  loginContainer.style.display = "none";
+  blogContainer.style.display = "block";
+}
 
-// SETTINGS MENU TOGGLE (called from HTML onclick)
+// -------------------- REQUIRE LOGIN --------------------
+function requireLogin() {
+  if (!currentUser()) {
+    showLoginPopup();
+    return false;
+  }
+  return true;
+}
+
+// -------------------- DARK THEME --------------------
 function settingsMenuToggle() {
   document.querySelector(".settings-menu").classList.toggle("active");
 }
-// Make globally available
-window.settingsMenuToggle = settingsMenuToggle;
 
-// Dark mode toggle
-if (darkBtn) {
-  darkBtn.addEventListener("click", () => {
-    darkBtn.classList.toggle("active");
-    document.body.classList.toggle("dark-theme");
-    localStorage.setItem(
-      "theme",
-      document.body.classList.contains("dark-theme") ? "dark" : "light"
-    );
-  });
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark-theme");
-    darkBtn.classList.add("active");
-  }
+
+darkBtn.addEventListener("click", () => {
+  darkBtn.classList.toggle("active");
+  document.body.classList.toggle("dark-theme");
+  localStorage.setItem("theme", document.body.classList.contains("dark-theme") ? "dark" : "light");
+});
+
+// Load Theme on refresh
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark-theme");
+  darkBtn.classList.add("active");
 }
-
-// Fetch posts from server
-async function fetchPosts() {
-  try {
-    const res = await fetch(API_URL);
-    posts = await res.json();
-    displayPosts(posts);
-  } catch (err) {
-    console.error("Error fetching posts:", err);
-    postsContainer.innerHTML = "<p>Unable to load posts.</p>";
-  }
-}
-
-// Render posts array into DOM
-function displayPosts(postsToDisplay) {
+// -------------------- RENDER POSTS --------------------
+function renderPosts(posts) {
   postsContainer.innerHTML = "";
-  // newest first
-  postsToDisplay.slice().reverse().forEach(post => {
-    const postEl = document.createElement("div");
-    postEl.classList.add("post");
+  const searchTerm = searchInput.value.toLowerCase();
 
-    // attachments
-    let attachments = "";
-    if (post.image) {
-      attachments += `<img src="http://127.0.0.1:5000${post.image}" alt="Post Image" style="max-width:100%;">`;
-    }
-    if (post.video) {
-      attachments += `<video src="http://127.0.0.1:5000${post.video}" controls style="max-width:100%;"></video>`;
-    }
+  posts
+    .filter(post => post.title.toLowerCase().includes(searchTerm) || post.content.toLowerCase().includes(searchTerm))
+    .forEach((post, index) => {
+      const div = document.createElement("div");
+      div.className = "post";
+      div.dataset.index = index;
 
-    const commentsHtml = (post.comments || []).map(c => {
-      return `
-        <div class="comment-item" data-comment-id="${c.id}">
-          <div class="comment-text-wrap">
-            <p class="comment-text">${escapeHtml(c.text)}</p>
-            <small class="comment-meta">${escapeHtml(c.timestamp)}</small>
+      div.innerHTML = `
+        <h3>${post.title}</h3>
+        <p><strong>${post.name}</strong> • ${post.timestamp}</p>
+        <p class="post-content">${post.content}</p>
+        ${post.image ? `<img src="${post.image}" class="post-media">` : ""}
+        ${post.video ? `<video controls class="post-media" src="${post.video}"></video>` : ""}
+        <div class="post-actions">
+          <button class="like-button">👍 <span class="like-count">${post.likes}</span></button>
+          <button class="delete-post">🗑 Delete</button>
+        </div>
+        <div class="comments">
+          <h4>Comments</h4>
+          <div class="comment-list">
+            ${post.comments
+              .map((c,i) => `<p>${c.text} • ${c.timestamp} <button class="delete-comment" data-comment-index="${i}">❌</button></p>`)
+              .join("")}
           </div>
-          <button class="delete-comment" data-comment-id="${c.id}" title="Delete comment">✖</button>
+          <input type="text" class="comment-input" placeholder="Add a comment...">
+          <button class="add-comment">Comment</button>
         </div>
       `;
-    }).join("");
 
-    const likesCount = post.likes || 0;
+      postsContainer.appendChild(div);
 
-    postEl.innerHTML = `
-      <h3>${escapeHtml(post.title || "")}</h3>
-      <p><strong>${escapeHtml(post.name || "")}</strong>: ${escapeHtml(post.content || "")}</p>
+      // -------------------- EVENT LISTENERS --------------------
+      div.querySelector(".like-button").addEventListener("click", () => {
+        post.likes++;
+        savePosts(posts);
+        div.querySelector(".like-count").textContent = post.likes;
+      });
 
-      <div class="attachments">${attachments}</div>
+      div.querySelector(".delete-post").addEventListener("click", () => {
+        posts.splice(index,1);
+        savePosts(posts);
+        renderPosts(posts);
+      });
 
-      <div class="post-meta">
-        <p class="date">Posted on: ${post.timestamp || ""}</p>
-        <div class="post-actions-inline">
-          <button class="like-btn"><i class="fas fa-thumbs-up"></i> <span class="like-count">${likesCount}</span></button>
-          <button class="delete-post">Delete</button>
-        </div>
-      </div>
+      const addCommentBtn = div.querySelector(".add-comment");
+      const commentInput = div.querySelector(".comment-input");
+      addCommentBtn.addEventListener("click", () => {
+        const text = commentInput.value.trim();
+        if (!text) return;
+        post.comments.push({ text, timestamp: new Date().toLocaleString() });
+        savePosts(posts);
+        renderPosts(posts);
+      });
 
-      <div class="comments-section">
-        <h3>Comments</h3>
-        <div class="comments-list">${commentsHtml}</div>
-        <div class="comment-input-container">
-          <input type="text" class="comment-input" placeholder="Write a comment...">
-          <button class="comment-post-btn">Post</button>
-        </div>
-      </div>
-    `;
-
-    // attach like handler
-    const likeBtn = postEl.querySelector(".like-btn");
-    likeBtn.addEventListener("click", async (e) => {
-      // animate quickly
-      likeBtn.classList.add("liked");
-      try {
-        const res = await fetch(`${API_URL}/${post.id}/like`, { method: "POST" });
-        if (!res.ok) throw new Error("Failed to like");
-        // slight delay so animation is visible
-        setTimeout(() => fetchPosts(), 220);
-      } catch (err) {
-        console.error("Like error:", err);
-        likeBtn.classList.remove("liked");
-      }
-      // remove animation after short delay (safety)
-      setTimeout(() => likeBtn.classList.remove("liked"), 600);
-    });
-
-    // delete post
-    postEl.querySelector(".delete-post").addEventListener("click", () => deletePost(post.id));
-
-    // add comment
-    const commentBtn = postEl.querySelector(".comment-post-btn");
-    const commentInput = postEl.querySelector(".comment-input");
-    commentBtn.addEventListener("click", async () => {
-      const text = commentInput.value.trim();
-      if (!text) return;
-      try {
-        const res = await fetch(`${API_URL}/${post.id}/comments`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
+      // Delete comment
+      div.querySelectorAll(".delete-comment").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          const cIndex = parseInt(btn.dataset.commentIndex);
+          post.comments.splice(cIndex, 1);
+          savePosts(posts);
+          renderPosts(posts);
         });
-        if (!res.ok) throw new Error("Failed to add comment");
-        commentInput.value = "";
-        // fetch updated posts
-        fetchPosts();
-      } catch (err) {
-        console.error("Add comment error:", err);
-        alert("Could not add comment.");
-      }
+      });
     });
 
-    // attach delete-comment handlers (delegated after rendering)
-    postEl.addEventListener("click", async (ev) => {
-      const target = ev.target;
-      if (target && target.classList.contains("delete-comment")) {
-        const commentId = target.dataset.commentId;
-        if (!confirm("Delete this comment?")) return;
-        const commentItem = target.closest(".comment-item");
-        try {
-          const res = await fetch(`${API_URL}/${post.id}/comments/${commentId}`, { method: "DELETE" });
-          if (!res.ok) throw new Error("Delete comment failed");
-          // animate removal, then refresh
-          commentItem.classList.add("comment-deleted");
-          setTimeout(() => fetchPosts(), 320);
-        } catch (err) {
-          console.error("Delete comment error:", err);
-          alert("Could not delete comment.");
-        }
-      }
-    });
-
-    postsContainer.appendChild(postEl);
-  });
+  if (postsContainer.innerHTML === "") {
+    postsContainer.innerHTML = "<p>No posts yet.</p>";
+  }
 }
 
-// Basic HTML-escape
-function escapeHtml(str) {
-  if (!str) return "";
-  return String(str).replace(/[&<>"']/g, s => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[s]));
-}
-
-// Submit new post
-postForm.addEventListener("submit", async (e) => {
+// -------------------- ADD POST --------------------
+function addPost(e) {
   e.preventDefault();
-  const formData = new FormData();
-  const name = document.getElementById("User_name").value;
-  const title = document.getElementById("post-title").value;
-  const content = document.getElementById("post-content").value;
+  if (!requireLogin()) return;
 
-  formData.append("name", name);
-  formData.append("title", title);
-  formData.append("content", content);
+  const posts = getPosts();
+  const title = document.getElementById("post-title").value.trim();
+  const content = document.getElementById("post-content").value.trim();
+  const name = currentUser().username;
 
-  if (fileInputImage.files.length > 0) formData.append("image", fileInputImage.files[0]);
-  if (fileInputVideo.files.length > 0) formData.append("video", fileInputVideo.files[0]);
+  if (!title || !content) return alert("Title and content required.");
 
-  try {
-    const res = await fetch(API_URL, { method: "POST", body: formData });
-    if (!res.ok) throw new Error("Failed to save post");
-    postForm.reset();
+  const image = fileInputImage.files[0] ? URL.createObjectURL(fileInputImage.files[0]) : "";
+  const video = fileInputVideo.files[0] ? URL.createObjectURL(fileInputVideo.files[0]) : "";
+
+  posts.unshift({
+    title,
+    content,
+    name,
+    timestamp: new Date().toLocaleString(),
+    image,
+    video,
+    likes: 0,
+    comments: []
+  });
+
+  savePosts(posts);
+  postForm.reset();
+  previewContainer.innerHTML = "";
+  renderPosts(posts);
+}
+
+// -------------------- SEARCH --------------------
+searchInput.addEventListener("input", () => renderPosts(getPosts()));
+
+// -------------------- UPLOAD PREVIEW --------------------
+uploadImageButton.addEventListener("click", () => fileInputImage.click());
+uploadVideoButton.addEventListener("click", () => fileInputVideo.click());
+[fileInputImage, fileInputVideo].forEach(input => {
+  input.addEventListener("change", () => {
     previewContainer.innerHTML = "";
-    fetchPosts();
-  } catch (err) {
-    console.error(err);
-    alert("Error saving post.");
+    [...fileInputImage.files].forEach(file => {
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.className = "preview";
+      previewContainer.appendChild(img);
+    });
+    [...fileInputVideo.files].forEach(file => {
+      const vid = document.createElement("video");
+      vid.src = URL.createObjectURL(file);
+      vid.controls = true;
+      vid.className = "preview";
+      previewContainer.appendChild(vid);
+    });
+  });
+});
+
+// -------------------- AUTH --------------------
+signupForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const users = loadUsers();
+  const username = document.getElementById("signupUsername").value.trim();
+  const password = document.getElementById("signupPassword").value;
+  const confirmPassword = document.getElementById("ConfirmsignupPassword").value;
+
+  if (!username) return alert("Username required");
+  if (users[username]) return alert("User exists");
+  if (password !== confirmPassword) return alert("Passwords do not match");
+
+  users[username] = {
+    username,
+    name: document.getElementById("signupName").value,
+    email: document.getElementById("signupEmail").value,
+    password
+  };
+  saveUsers(users);
+  alert("Signup successful! Please login.");
+  document.getElementById("Signup").style.display = "none";
+  document.getElementById("Signin").style.display = "block";
+});
+
+loginForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const users = loadUsers();
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value;
+
+  if (!users[username] || users[username].password !== password) return alert("Invalid credentials!");
+
+  localStorage.setItem("user", JSON.stringify(users[username]));
+  settingsUsername.textContent = username;
+  showBlog();
+  renderPosts(getPosts());
+});
+
+logoutBtnLink.addEventListener("click", () => {
+  localStorage.removeItem("user");
+  showLoginPopup();
+  alert("Logged out");
+});
+
+goToSignup.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.getElementById("Signin").style.display = "none";
+  document.getElementById("Signup").style.display = "block";
+});
+goToSignin.addEventListener("click", (e) => {
+  e.preventDefault();
+  document.getElementById("Signup").style.display = "none";
+  document.getElementById("Signin").style.display = "block";
+});
+
+// -------------------- CLEAR POSTS --------------------
+clearPostsButton.addEventListener("click", () => {
+  if (!requireLogin()) return;
+  if (confirm("Delete all posts?")) {
+    savePosts([]);
+    renderPosts([]);
   }
 });
 
-// Delete post
-async function deletePost(id) {
-  if (!confirm("Delete this post?")) return;
-  try {
-    const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error("Delete failed");
-    fetchPosts();
-  } catch (err) {
-    console.error(err);
-    alert("Could not delete post.");
-  }
-}
-
-// Add comment (legacy function not used — kept for compat)
-async function addComment(postId, text) {
-  try {
-    const res = await fetch(`${API_URL}/${postId}/comments`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
-    });
-    if (!res.ok) throw new Error("Failed to add comment");
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// Clear all posts
-clearPostsButton.addEventListener("click", async () => {
-  if (!confirm("Clear all posts? This cannot be undone.")) return;
-  try {
-    const res = await fetch(API_URL);
-    const all = await res.json();
-    await Promise.all(all.map(p => fetch(`${API_URL}/${p.id}`, { method: "DELETE" })));
-    fetchPosts();
-  } catch (err) {
-    console.error(err);
-    alert("Could not clear posts.");
+// -------------------- SEARCH FUNCTIONALITY --------------------
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+  postsContainer.innerHTML = "";
+  let found = false;
+  posts.forEach((post, index) => {
+    if (
+      post.title.toLowerCase().includes(query) ||
+      post.content.toLowerCase().includes(query) ||
+      post.name.toLowerCase().includes(query)
+    ) {
+      found = true;
+      const postElement = document.createElement("div");
+      postElement.classList.add("post");
+      postElement.innerHTML = `
+        <h3>${post.title}</h3>
+        <p><strong>${post.name}</strong>: ${post.content}</p>
+        <p class="date">Posted on: ${post.timestamp}</p>
+        <div class="attachments">${post.media.join("")}</div>
+        <div class="post-actions">
+          <button class="like-button">👍 Like <span class="like-count">${post.likes}</span></button>
+          <button class="comment-toggle">💬 Comment</button>
+        </div>
+      `;
+      postsContainer.prepend(postElement);
+    }
+  });
+  if (!found) {
+    postsContainer.innerHTML = "<p>No posts found.</p>";
   }
 });
 
-// Search filter
-searchInput.addEventListener("input", (e) => {
-  const q = e.target.value.trim().toLowerCase();
-  if (!q) return displayPosts(posts);
-  const filtered = posts.filter(p =>
-    (p.title || "").toLowerCase().includes(q) ||
-    (p.content || "").toLowerCase().includes(q) ||
-    (p.name || "").toLowerCase().includes(q)
-  );
-  displayPosts(filtered);
+
+// -------------------- INIT --------------------
+document.addEventListener("DOMContentLoaded", () => {
+  const user = currentUser();
+  if (!user) {
+    showLoginPopup();
+  } else {
+    settingsUsername.textContent = user.username;
+    showBlog();
+    renderPosts(getPosts());
+  }
 });
 
-// Like animation
-function likePost(postId, btn) {
-  fetch(`/posts/${postId}/like`, { method: "POST" })
-    .then(res => res.json())
-    .then(data => {
-      btn.classList.add("liked");
-      setTimeout(() => btn.classList.remove("liked"), 400);
-      btn.querySelector(".like-count").textContent = data.likes;
-    });
-}
-
-// Delete comment animation
-function deleteComment(postId, commentId, commentElement) {
-  fetch(`/posts/${postId}/comments/${commentId}`, { method: "DELETE" })
-    .then(res => res.json())
-    .then(() => {
-      commentElement.classList.add("removed");
-      setTimeout(() => commentElement.remove(), 400);
-    });
-}
-
-
-// initial load
-fetchPosts();
+// -------------------- POST FORM SUBMIT --------------------
+postForm.addEventListener("submit", addPost);
