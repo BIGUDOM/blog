@@ -335,10 +335,16 @@ main {
 
 .attachments img,
 .attachments video {
-  max-width: 100%;
-  margin-top: 10px;
+  display: block;
+  max-width: 90%;       /* scale to 90% of container/screen width */
+  max-height: 60vh;     /* prevent from taking full screen height */
+  width: auto;          /* maintain aspect ratio */
+  height: auto;         /* maintain aspect ratio */
+  margin: 10px auto;    /* center the media */
   border-radius: 6px;
+  object-fit: contain;  /* ensures videos/images fit nicely inside box */
 }
+
 
 .post-actions {
   margin-top: 10px;
@@ -756,4 +762,5 @@ body.dark-theme .right-sidebar {
     display: block;
   }
 }
+
 
