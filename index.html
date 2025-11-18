@@ -109,7 +109,10 @@
             <i class="fas fa-user-circle"></i>
             <div>
               <p id="settingsUsername">User</p>
-              <a href="#">See your profile</a>
+              <a href="profile.html" class="see-profile">See your profile</a>
+
+
+              
             </div>
           </div>
           <hr>
@@ -171,7 +174,7 @@
         <section class="add-post">
           <h2>Add a New Post</h2>
           <form id="post-form">
-            <input type="text" id="User_name" placeholder="Your Name" required>
+            <!-- <input type="text" id="User_name" placeholder="Your Name" required> -->
             <input type="text" id="post-title" placeholder="Post Title" required>
             <textarea id="post-content" placeholder="Post Content" required></textarea>
 
@@ -247,6 +250,20 @@
       <p>&copy; 2023 Bigudom Blog. All rights reserved.</p>
     </footer>
   </div>
+
+  <!-- Overlay for clicking outside to close sidebars -->
+  <div class="sidebar-overlay"></div>
+
+  <!-- Mobile toggle buttons -->
+<!-- Mobile Left Sidebar Toggle Button -->
+<button class="mobile-left-btn">
+  <i class="fas fa-bars"></i>
+</button>
+
+  <button class="mobile-right-btn">
+    <i class="fas fa-bars"></i>
+  </button>
+
 
   <script src="script.js"></script>
 </body>

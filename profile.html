@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Profile</title>
+  <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+
+  <div class="profile-container">
+    <h2>Your Profile</h2>
+
+    <!-- Profile Picture -->
+    <div class="profile-pic-container" style="position: relative;">
+      <img id="profilePicture" src="default-avatar.png" class="profile-pic">
+      <div class="pic-menu">
+        <button type="button" id="changePicBtn">Change Photo</button>
+        <button type="button" id="removePicBtn">Remove Photo</button>
+      </div>
+    </div>
+
+    <!-- Profile Form -->
+    <form id="profileForm">
+      <label>Full Name</label>
+      <input type="text" id="profileName">
+
+      <label>Username</label>
+      <input type="text" id="profileUsername" disabled>
+
+      <label>Email</label>
+      <input type="email" id="profileEmail">
+
+      <label>Bio</label>
+      <textarea id="profileBio"></textarea>
+
+      <label>Change Password</label>
+      <input type="password" id="profilePassword" placeholder="New password (optional)">
+
+      <label>Upload New Profile Picture</label>
+      <input type="file" id="newProfilePic" accept="image/*">
+
+      <button type="submit">Save Changes</button>
+    </form>
+
+    <button id="deleteAccount" style="background:#c0392b; margin-top: 15px;">Delete Account</button>
+
+    <!-- Back to Blog Button -->
+    <a href="index.html" id="backToBlog" class="back-btn" style="display:inline-block; margin-bottom:20px; text-decoration:none;">← Back to Blog</a>
+
+    <!-- User's Posts -->
+    <div id="myPostsList" style="margin-top: 30px;">
+      <h3>My Posts</h3>
+      <!-- JS will render posts here -->
+    </div>
+  </div>
+
+  <script src="profile.js"></script>
+</body>
+</html>
